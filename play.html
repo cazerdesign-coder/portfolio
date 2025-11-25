@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play - Sam Cazer</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <style>
+        /* Gallery-specific styles */
+        .gallery-hero {
+            min-height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10rem 5% 3rem;
+            text-align: center;
+        }
+
+        .gallery-hero h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--soil);
+        }
+
+        .gallery-hero .highlight {
+            color: var(--sage);
+        }
+
+        .gallery-hero p {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Masonry-style Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+            gap: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: 4rem;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s;
+            box-shadow: 0 8px 30px rgba(123, 175, 127, 0.1);
+            border: 2px solid #f2f7f3;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(123, 175, 127, 0.25);
+            border-color: var(--sage);
+        }
+
+        /* Varied heights for masonry effect */
+        .gallery-item:nth-child(6n+1) { grid-row: span 1; }
+        .gallery-item:nth-child(6n+2) { grid-row: span 2; }
+        .gallery-item:nth-child(6n+3) { grid-row: span 1; }
+        .gallery-item:nth-child(6n+4) { grid-row: span 2; }
+        .gallery-item:nth-child(6n+5) { grid-row: span 1; }
+        .gallery-item:nth-child(6n+6) { grid-row: span 2; }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(3rem, 6vw, 5rem);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Different gradient backgrounds */
+        .gallery-item:nth-child(8n+1) .gallery-image { 
+            background: linear-gradient(135deg, var(--sage), var(--moss)); 
+        }
+        .gallery-item:nth-child(8n+2) .gallery-image { 
+            background: linear-gradient(135deg, #8fc293, var(--sage)); 
+        }
+        .gallery-item:nth-child(8n+3) .gallery-image { 
+            background: linear-gradient(135deg, var(--moss), #4d7a50); 
+        }
+        .gallery-item:nth-child(8n+4) .gallery-image { 
+            background: linear-gradient(135deg, #a0c8a3, var(--sage)); 
+        }
+        .gallery-item:nth-child(8n+5) .gallery-image { 
+            background: linear-gradient(135deg, var(--terracotta), #f59e0b); 
+        }
+        .gallery-item:nth-child(8n+6) .gallery-image { 
+            background: linear-gradient(135deg, var(--clay), var(--terracotta)); 
+        }
+        .gallery-item:nth-child(8n+7) .gallery-image { 
+            background: linear-gradient(135deg, #7BAF7F, #92c595); 
+        }
+        .gallery-item:nth-child(8n+8) .gallery-image { 
+            background: linear-gradient(135deg, var(--warm-brown), var(--earth-brown)); 
+        }
+
+        .gallery-image::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15), transparent);
+            opacity: 0.5;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+
+        .gallery-overlay h3 {
+            color: white;
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .gallery-overlay p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.5;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--sage);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            padding: 0 5%;
+        }
+
+        .filter-tab {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border: 2px solid #f2f7f3;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--soil);
+        }
+
+        .filter-tab:hover {
+            border-color: var(--sage);
+            transform: translateY(-2px);
+        }
+
+        .filter-tab.active {
+            background: var(--sage);
+            color: white;
+            border-color: var(--sage);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+            }
+
+            .gallery-item:nth-child(n) {
+                grid-row: span 1;
+            }
+
+            .gallery-hero {
+                padding: 8rem 5% 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+    <div class="container">
+        <div class="logo">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.5rem;">
+                <img src="images/logo.svg" class="logo-image">
+                <span class="logo-text">cazerdesign</span>
+            </a>
+        </div>
+        <ul id="nav-menu">
+            <li><a href="index.html" class="nav-link" style="text-decoration: none; color: inherit;">Home</a></li>
+            <li><a href="index.html#work" class="nav-link" style="text-decoration: none; color: inherit;">Work</a></li>
+            <li><a href="play.html" class="nav-link" style="text-decoration: none; color: inherit;">Play</a></li>
+            <li><a href="about.html" class="nav-link" style="text-decoration: none; color: inherit;">About</a></li>
+            <li><a href="Resume/Sam_Cazer_UIUX_Resume.pdf" target="_blank" class="nav-link" style="text-decoration: none; color: inherit;">Resume</a></li>
+        </ul>
+    </div>
+</nav>
+    </nav>
+
+    <div class="gallery-hero">
+        <div>
+            <h1>The <span class="highlight">Playground</span></h1>
+            <p>Where experimentation flourishes—explorations in design, motion, interaction, and creative experiments that grow beyond boundaries.</p>
+        </div>
+    </div>
+
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="illustration">Illustration</button>
+        <button class="filter-tab" data-filter="motion">Motion</button>
+        <button class="filter-tab" data-filter="3d">3D</button>
+        <button class="filter-tab" data-filter="experiment">Experiments</button>
+        <button class="filter-tab" data-filter="graphic-design">Graphic Design</button>
+    </div>
+
+    <section style="padding-top: 0;">
+        <div class="gallery-grid">
+            <!-- Gallery Item 1 -->
+            <div class="gallery-item" data-category="graphic-design">
+                <div class="gallery-image">
+                    <img src="images/Pineapple.png" alt="Crazy Calculator 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+
+                </div>
+                <span class="category-badge">Graphic Design</span>
+                <div class="gallery-overlay">
+                    <h3>Character Studies</h3>
+                    <p>Exploring personality through visual design and playful character creation.</p>
+                </div>
+            </div>
+
+            <!-- Gallery Item 2 -->
+           <div class="gallery-item" data-category="motion">
+    <div class="gallery-image">
+        <video src="images/Letter R.mp4" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
+            Your browser does not support the video tag.
+        </video>
+    </div>  
+    <span class="category-badge">Motion</span>
+    <div class="gallery-overlay">
+        <h3>10 Days of Type</h3>
+        <p>Created using After Effects and Cinema 4D</p>
+    </div>
+</div>
+
+            <!-- Gallery Item 3 -->
+            <div class="gallery-item" data-category="3d">
+                <div class="gallery-image">
+                     <img src="images/CrazyCalculator.png" alt="Crazy Calculator 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <span class="category-badge">3D</span>
+                <div class="gallery-overlay">
+                    <h3>Crazy Calculator</h3>
+                    <p>Creating a 3D prototype in Spline.</p>
+                 </div>
+            </div>
+
+            <!-- Gallery Item 4 -->
+            <div class="gallery-item" data-category="experiment">
+                 <div class="gallery-image">
+                     <img src="images/Rive_ScreenRecording.mp4" alt="Crazy Calculator 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <span class="category-badge">Experiment & Motion</span>
+                <div class="gallery-overlay">
+                    <h3>Rive Cryptid Animation</h3>
+                    <p>Interactive animated prototype created using Rive.</p>
+                </div>
+            </div>
+
+            <!-- Gallery Item 5 -->
+            <div class="gallery-item" data-category="illustration">
+                <div class="gallery-image">
+                    <img src="images/HypeIllustration.png" alt="Crazy Calculator 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+
+                </div>
+                <span class="category-badge">Illustration</span>
+                <div class="gallery-overlay">
+                    <h3>Botanical Series</h3>
+                    <p>Hand-drawn plant studies celebrating natural forms and textures.</p>
+                </div>
+            </div>
+
+            <!-- Gallery Item 6 -->
+            <div class="gallery-item" data-category="graphic-design">
+                <div class="gallery-image">
+                    <img src="images/ACADecal.png" alt="Crazy Calculator 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+
+                </div>
+                <span class="category-badge">Graphic Design</span>
+                <div class="gallery-overlay">
+                    <h3>Flow States</h3>
+                    <p>Abstract motion pieces exploring rhythm, flow, and organic movement.</p>
+                </div>
+            </div>
+
+            <!-- Gallery Item 7 -->
+            <div class="gallery-item" data-category="3d">
+                <div class="gallery-image">
+                     <img src="images/engine.png" alt="Engine 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <span class="category-badge">3D</span>
+                <div class="gallery-overlay">
+                    <h3>3D Engine</h3>
+                    <p>Animated 3D Engine made in Cinema 4D.</p>
+                 </div>
+            </div>
+
+            <!-- Gallery Item 8 -->
+            <div class="gallery-item" data-category="graphic-design">
+                <div class="gallery-image">
+                    <img src="images/FreezefestStickers.png" alt="Crazy Calculator 3D render" style="width: 100%; height: 100%; object-fit: cover;">
+
+                </div>
+                <span class="category-badge">Graphic Design</span>
+                <div class="gallery-overlay">
+                    <h3>Interactive Poetry</h3>
+                    <p>Merging words and interaction to create immersive reading experiences.</p>
+                </div>
+            </div>
+
+           
+            <!-- Gallery Item 9 -->
+            <div class="gallery-item" data-category="3d">
+               <div class="gallery-image">
+                     <img src="images/imagine.png" alt="Imagine RIT 3D Poster" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <span class="category-badge">3D</span>
+                <div class="gallery-overlay">
+                    <h3>Imagine RIT Poster</h3>
+                    <p>3D poster design created in Cinema 4D.</p>
+                 </div>
+            </div>
+
+             </div> <!-- Close gallery-grid -->
+    </section> <!-- Close section -->
+
+           
+
+    <footer>
+  <div class="footer-content">
+      <img src="images/Gunther.png" alt="Design Garden Illustration" style="width: 90%; height:auto; border-radius:12px;">
+    <div class="footer-text" style="width: 90%">
+      <p class="footer-tagline">Thanks for visiting my Design Garden</p>
+      <p class="footer-copyright">🌱 Grown with care by Sam Cazer • 2025</p>
+      <div class="footer-links">
+        <a href="mailto:sam@cazerdesign.com">Email</a>
+        <a href="https://www.linkedin.com/in/samcazer">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    <script>
+        // Filter functionality
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                filterTabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                const filter = tab.getAttribute('data-filter');
+
+                // Filter gallery items
+                galleryItems.forEach(item => {
+                    if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                        item.style.display = 'block';
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'scale(1)';
+                        }, 10);
+                    } else {
+                        item.style.opacity = '0';
+                        item.style.transform = 'scale(0.8)';
+                        setTimeout(() => {
+                            item.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Smooth reveal on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        galleryItems.forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html>
